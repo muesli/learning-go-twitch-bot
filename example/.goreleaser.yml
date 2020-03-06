@@ -1,0 +1,90 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+  - go mod download
+builds:
+  -
+    id: "twitch-bot"
+    binary: twitch-bot
+    ldflags: -s -w -X main.Version={{ .Version }} -X main.CommitSHA={{ .Commit }}
+    goos:
+      - linux
+      - freebsd
+      - windows
+    goarch:
+      - amd64
+      - arm64
+      - 386
+      - arm
+    goarm:
+      - 6
+      - 7
+  -
+    id: "darwin"
+    binary: "twitch-bot"
+    ldflags: -s -w -X main.Version={{ .Version }} -X main.CommitSHA={{ .Commit }}
+    goos:
+      - darwin
+    goarch:
+      - amd64
+
+archives:
+  - id: default
+    builds:
+      - twitch-bot
+    format_overrides:
+      - goos: windows
+        format: zip
+    replacements:
+      windows: Windows
+      386: i386
+      amd64: x86_64
+  - id: darwin
+    builds:
+      - darwin
+    replacements:
+      darwin: Darwin
+      amd64: x86_64
+
+nfpms:
+  -
+    builds:
+    - twitch-bot
+
+    vendor: curi0s
+    homepage: ""
+    maintainer: "Fabian <fabian@fabian>"
+    description: "A Twitch Bot"
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin
+
+brews:
+  - ids:
+    - darwin
+    github:
+      owner: curi0s
+      name: homebrew-tap
+    commit_author:
+      name: "Fabian"
+      email: "fabian@fabian"
+    homepage: ""
+    description: "A Twitch Bot"
+    # skip_upload: true
+
+signs:
+  - artifacts: checksum
+
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
