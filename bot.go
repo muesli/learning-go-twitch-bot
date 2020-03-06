@@ -8,12 +8,14 @@ import (
 	"strings"
 )
 
+// Options are used to configure the bot.
 type Options struct {
 	Username string
 	Token    string
 	Channel  string
 }
 
+// Twitch is a twitch IRC bot.
 type Twitch struct {
 	opts Options
 
@@ -22,6 +24,7 @@ type Twitch struct {
 	cEvents chan interface{}
 }
 
+// NewTwitch returns a new Twitch bot.
 func NewTwitch(options Options) *Twitch {
 	return &Twitch{
 		opts:    options,
@@ -34,6 +37,8 @@ func (t *Twitch) Options() Options {
 	return t.opts
 }
 
+// Connect establishes a connection to the IRC server,
+// returning an event channel.
 func (t *Twitch) Connect() chan interface{} {
 	var err error
 	t.conn, err = net.Dial("tcp", "irc.chat.twitch.tv:6667")
@@ -57,6 +62,7 @@ func (t *Twitch) send() {
 	}
 }
 
+// SendMessage sends a message
 func (t *Twitch) SendMessage(message string) {
 	t.cSend <- message
 }
